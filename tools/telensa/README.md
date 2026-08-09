@@ -313,6 +313,24 @@ ones are inferences rather than facts.
 | `unb_demod.py` | Burst detection, deviation, symbol rate, bit recovery |
 | `unb_survey.py` | Channel occupancy and hop-sequence logging |
 | `unb_frames.py` | Multi-burst alignment, entropy analysis, CRC search |
+| `UNB_FSK_Field_Manual.pdf` | **Print this and take it with you.** Step-by-step measurement procedures |
+| `make_field_manual.py` | Regenerates the manual (needs reportlab) |
+
+## 11. Field manual
+
+`UNB_FSK_Field_Manual.pdf` is the on-site companion to this README: eight
+measurement procedures (M1–M8), each naming the firmware value it pins down, the
+exact commands, acceptance criteria that must be met before a value is baked in,
+troubleshooting trees, and blank recording sheets.
+
+It carries firmware line references, so regenerate it whenever a placeholder
+constant moves:
+
+```sh
+python3 make_field_manual.py --out UNB_FSK_Field_Manual.pdf
+```
+
+A manual that has drifted out of step with the code is worse than none.
 
 Capture metadata: prefer SigMF, so parameters cannot get separated from the
 data. Failing that, a sidecar recording centre frequency, sample rate, gain,

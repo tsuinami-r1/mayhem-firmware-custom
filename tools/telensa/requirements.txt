@@ -2,3 +2,8 @@
 # package is not a problem you can fix from inside a shielded enclosure, so all
 # filtering, spectra and demodulation are implemented against numpy in iqio.py.
 numpy>=1.20
+
+# Only needed to regenerate the field manual PDF (make_field_manual.py), which
+# is committed pre-built. Not required for any measurement work, so do not let
+# its absence block a capture session.
+# reportlab>=4.0
