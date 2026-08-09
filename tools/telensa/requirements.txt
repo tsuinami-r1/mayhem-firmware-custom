@@ -1,0 +1,4 @@
+# numpy is the only hard dependency. scipy is deliberately avoided: a missing
+# package is not a problem you can fix from inside a shielded enclosure, so all
+# filtering, spectra and demodulation are implemented against numpy in iqio.py.
+numpy>=1.20

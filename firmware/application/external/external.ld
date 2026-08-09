@@ -115,6 +115,7 @@ MEMORY
     ram_external_app_vor_tx                (rwx) : org = 0xAE0A0000, len = 32k
     ram_external_app_signal_hunter         (rwx) : org = 0xAE0B0000, len = 32k
     ram_external_app_tetra_rx              (rwx) : org = 0xAE0C0000, len = 32k
+    ram_external_app_telensa_tx            (rwx) : org = 0xAE0D0000, len = 32k
 }
 
 SECTIONS
@@ -670,6 +671,12 @@ SECTIONS
         KEEP(*(.external_app.app_tetra_rx.application_information));
         */external/tetra_rx/*(*ui*external_app*tetra_rx*);
     } > ram_external_app_tetra_rx
+
+    .external_app_telensa_tx : ALIGN(4) SUBALIGN(4)
+    {
+        KEEP(*(.external_app.app_telensa_tx.application_information));
+        */external/telensa_tx/*(*ui*external_app*telensa_tx*);
+    } > ram_external_app_telensa_tx
 
 
 
