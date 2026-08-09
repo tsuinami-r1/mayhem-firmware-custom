@@ -294,6 +294,11 @@ set(EXTCPPSRC
 	external/bht_tx/ui_bht_tx.cpp
 	external/bht_tx/bht.cpp
 
+	#telensa_tx
+	external/telensa_tx/main.cpp
+	external/telensa_tx/ui_telensa_tx.cpp
+	external/telensa_tx/telensa.cpp
+
 	#morse_practice - 80 byte flash - bc of array initializers
 	external/morse_practice/main.cpp
 	external/morse_practice/ui_morse_practice.cpp
@@ -464,6 +469,7 @@ set(EXTAPPLIST
 	soundboard
 	game2048
 	bht_tx
+	telensa_tx
 	morse_practice
 	adult_toys_controller
 	flex_rx
