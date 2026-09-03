@@ -59,3 +59,4 @@ const std::filesystem::path keeloq_keys_dir = u"KEELOQKEYS";
 const std::filesystem::path keeloq_remotes_dir = u"KEELOQREMOTES";
 const std::filesystem::path secplus_dir = u"SECPLUS";
 const std::filesystem::path epirb_dir = u"EPIRB";
+const std::filesystem::path geofence_dir = u"GEOFENCE";
