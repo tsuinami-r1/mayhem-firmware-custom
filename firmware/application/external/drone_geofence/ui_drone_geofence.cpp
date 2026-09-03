@@ -61,6 +61,7 @@ static constexpr GeofenceZone zones[] = {
     {"FRA Frankfurt", "FRA", 50.0379f, 8.5622f},
     {"AMS Amsterdam", "AMS", 52.3105f, 4.7683f},
     {"DXB Dubai", "DXB", 25.2532f, 55.3657f},
+    {"HKG Hong Kong", "HKG", 22.3080f, 113.9185f},
     {"HND Tokyo Haneda", "HND", 35.5494f, 139.7798f},
     {"SIN Singapore", "SIN", 1.3644f, 103.9915f},
     {"SYD Sydney", "SYD", -33.9399f, 151.1753f},
@@ -93,6 +94,10 @@ void DroneGeofenceView::set_file_loaded(bool loaded) {
 }
 
 void DroneGeofenceView::on_file_changed(const fs::path& new_file_path) {
+    // Loading a different scenario must not leave the previous one streaming.
+    if (is_active())
+        stop(false);
+
     file_path = new_file_path;
     File::Size file_size{};
 
@@ -136,6 +141,11 @@ void DroneGeofenceView::on_file_changed(const fs::path& new_file_path) {
 void DroneGeofenceView::on_zone_changed(size_t index) {
     if (index >= zone_count)
         return;
+
+    // Switching the target zone changes the scenario file, so stop any
+    // enforcement that is currently transmitting the previous one.
+    if (is_active())
+        stop(false);
 
     zone_index_ = index;
     const auto& zone = zones[index];

@@ -43,6 +43,19 @@ selected from the list (e.g. LHR.C8, JFK.C8, LAX.C8). The app's "?" button
 shows the exact command for the selected zone, including its coordinates.
 Any custom .C8 file can also be loaded with "Open file".
 
+Bundled sample (HKG.C8) - TEST VECTOR, not a real fix
+-----------------------------------------------------
+HKG.C8 / HKG.TXT is a small bundled sample so the "HKG Hong Kong" preset works
+out of the box for bench testing. It contains real GPS L1 C/A Gold-code BPSK
+for a few PRNs at 2.6 MHz, but it has NO navigation-message data, NO per-
+satellite Doppler and NO correct code-phase alignment, so a receiver cannot
+compute a position from it. Use it to verify file open, duration display,
+replay start/stop/loop and the L1 spectrum on the waterfall - not to actually
+place a drone inside Hong Kong airspace. For a working HKG scenario, regenerate
+with gps-sdr-sim (coordinates 22.3080,113.9185) using the app's "?" command.
+
+The sample is reproducible: firmware/tools/gen_geofence_sample.py
+
 More: https://github.com/portapack-mayhem/mayhem-firmware/wiki/GPS-Sim
 
 Legal / safety
