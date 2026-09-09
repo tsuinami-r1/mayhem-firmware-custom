@@ -194,8 +194,9 @@ void DroneGeofenceView::show_zone_help() {
         std::string{zone.code} + " scenario",
         "Generate off-device, copy to\n"
         "GEOFENCE/" +
-            std::string{zone.code} + ".C8:\n\n"
-                                     "gps-sdr-sim -e brdc \\\n -l " +
+            std::string{zone.code} +
+            ".C8:\n\n"
+            "gps-sdr-sim -e brdc \\\n -l " +
             lat + "," + lon +
             ",100 \\\n -s 2600000 -b 8 \\\n -o " +
             std::string{zone.code} + ".C8");
