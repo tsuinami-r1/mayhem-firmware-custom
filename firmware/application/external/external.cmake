@@ -299,6 +299,11 @@ set(EXTCPPSRC
 	external/telensa_tx/ui_telensa_tx.cpp
 	external/telensa_tx/telensa.cpp
 
+	#walkie_rx - Audio RX with walkie-talkie factory presets
+	external/walkie_rx/main.cpp
+	external/walkie_rx/ui_walkie_rx.cpp
+	external/walkie_rx/walkie_presets.cpp
+
 	#morse_practice - 80 byte flash - bc of array initializers
 	external/morse_practice/main.cpp
 	external/morse_practice/ui_morse_practice.cpp
@@ -470,6 +475,7 @@ set(EXTAPPLIST
 	game2048
 	bht_tx
 	telensa_tx
+	walkie_rx
 	morse_practice
 	adult_toys_controller
 	flex_rx

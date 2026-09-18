@@ -42,7 +42,10 @@ namespace ui {
 class MicTXView : public View {
    public:
     MicTXView(NavigationView& nav);
-    MicTXView(NavigationView& nav, ReceiverModel::settings_t override);
+    /* Launch from another app. tone_key_index >= 0 selects the CTCSS tone key
+     * (index into tonekey::tone_keys), tx_deviation_khz > 0 sets the FM TXBW;
+     * the defaults leave both at whatever Mic TX last saved. */
+    MicTXView(NavigationView& nav, ReceiverModel::settings_t override, int32_t tone_key_index = -1, uint32_t tx_deviation_khz = 0);
     ~MicTXView();
 
     MicTXView(const MicTXView&) = delete;

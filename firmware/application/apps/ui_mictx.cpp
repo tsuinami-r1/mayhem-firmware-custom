@@ -614,7 +614,9 @@ MicTXView::MicTXView(
 
 MicTXView::MicTXView(
     NavigationView& nav,
-    ReceiverModel::settings_t override)
+    ReceiverModel::settings_t override,
+    int32_t tone_key_index_override,
+    uint32_t tx_deviation_khz)
     : MicTXView(nav) {
     // Settings to override when launched from another app (versus from AppSettings .ini file)
     // Try to use the modulation/bandwidth from RX settings.
@@ -639,6 +641,14 @@ MicTXView::MicTXView(
 
     field_frequency.set_value(override.frequency_app_override);
     check_common_freq_tx_rx.set_value(true);  // freq passed from other app is in tx_frequency, so set rx_frequency=tx_frequency
+
+    // Optional tone key / deviation from the calling app (e.g. a walkie-talkie
+    // channel preset). Set after options_mode so the mode change's defaults
+    // don't overwrite them; set_selected_index/set_value fire on_change.
+    if (tone_key_index_override >= 0 && (size_t)tone_key_index_override < tone_keys.size())
+        options_tone_key.set_selected_index(tone_key_index_override);
+    if (tx_deviation_khz > 0)
+        field_bw.set_value(tx_deviation_khz);
 
     // TODO: bandwidth selection is tied too tightly to the UI
     // controls. It's not possible to set the bandwidth here without
