@@ -57,9 +57,9 @@ static constexpr GnssBand bands[] = {
 };
 static constexpr size_t band_count = sizeof(bands) / sizeof(bands[0]);
 
-// band_checks_ is a fixed array of checkbox pointers; keep the two in step so
-// adding a band without adding its checkbox can't walk off the end.
-static_assert(band_count == 5, "band_checks_ must have one entry per band");
+// band_check() maps an index to one of five checkbox members; keep the two in
+// step so adding a band without adding its checkbox can't silently alias L1.
+static_assert(band_count == 5, "band_check() must handle one case per band");
 
 // Curated no-fly-zone reference locations. Index 0 is the manual entry
 // (open any file). The rest map to <code>_<band>.C8 scenario files in the
@@ -80,10 +80,9 @@ static constexpr GeofenceZone zones[] = {
 };
 static constexpr size_t zone_count = sizeof(zones) / sizeof(zones[0]);
 
-static bool file_exists(const fs::path& path) {
-    File probe;
-    return !probe.open(path);
-}
+// NB: scenario presence is tested with std::filesystem::file_exists() from
+// file.hpp (an f_stat, no open required) - don't add a local helper of that
+// name, it makes the calls below ambiguous via ADL on fs::path.
 
 static std::string format_coord(float value, char pos, char neg) {
     char hemi = (value >= 0.0f) ? pos : neg;
@@ -98,6 +97,22 @@ static std::string format_signed(float value) {
     float mag = (value >= 0.0f) ? value : -value;
     std::string s = to_string_decimal(mag, 4);
     return (value < 0.0f) ? ("-" + s) : s;
+}
+
+Checkbox& DroneGeofenceView::band_check(size_t index) {
+    switch (index) {
+        case 1:
+            return check_band_1;
+        case 2:
+            return check_band_2;
+        case 3:
+            return check_band_3;
+        case 4:
+            return check_band_4;
+        case 0:
+        default:
+            return check_band_0;
+    }
 }
 
 void DroneGeofenceView::set_ready() {
@@ -210,7 +225,7 @@ void DroneGeofenceView::on_zone_changed(size_t index) {
     // filename / duration fields show something useful before transmitting.
     file_loaded_ = false;
     for (size_t i = 0; i < band_count; i++) {
-        if (!band_checks_[i]->value())
+        if (!band_check(i).value())
             continue;
         auto path = band_file_for(i);
         if (path.empty())
@@ -308,7 +323,7 @@ size_t DroneGeofenceView::rebuild_cycle() {
     }
 
     for (size_t i = 0; i < band_count && cycle_len_ < max_cycle; i++) {
-        if (!band_checks_[i]->value())
+        if (!band_check(i).value())
             continue;
         auto path = band_file_for(i);
         if (path.empty())
@@ -451,7 +466,7 @@ void DroneGeofenceView::update_band_summary() {
 
     std::string ready;
     for (size_t i = 0; i < band_count; i++) {
-        if (!band_checks_[i]->value())
+        if (!band_check(i).value())
             continue;
         if (band_file_for(i).empty())
             continue;
@@ -494,16 +509,10 @@ DroneGeofenceView::DroneGeofenceView(
         &waterfall,
     });
 
-    band_checks_[0] = &check_band_0;
-    band_checks_[1] = &check_band_1;
-    band_checks_[2] = &check_band_2;
-    band_checks_[3] = &check_band_3;
-    band_checks_[4] = &check_band_4;
-
     // L1 on by default: widest coverage, and matches single-band behaviour.
     check_band_0.set_value(true);
     for (size_t i = 0; i < band_count; i++) {
-        band_checks_[i]->on_select = [this](Checkbox&, bool) {
+        band_check(i).on_select = [this](Checkbox&, bool) {
             this->on_bands_changed();
         };
     }
@@ -536,10 +545,10 @@ DroneGeofenceView::DroneGeofenceView(
         // Toggle between "every band" and "L1 only".
         bool all_on = true;
         for (size_t i = 0; i < band_count; i++)
-            all_on = all_on && band_checks_[i]->value();
+            all_on = all_on && band_check(i).value();
 
         for (size_t i = 0; i < band_count; i++)
-            band_checks_[i]->set_value(all_on ? (i == 0) : true);
+            band_check(i).set_value(all_on ? (i == 0) : true);
 
         this->on_bands_changed();
     };

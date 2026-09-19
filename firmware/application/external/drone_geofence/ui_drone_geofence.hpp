@@ -152,8 +152,9 @@ class DroneGeofenceView : public View {
     uint32_t loops_done_{0};
     bool cycling_{false};
 
-    // Filled in the constructor so the band checkboxes can be walked by index.
-    Checkbox* band_checks_[5]{};
+    // Band checkboxes addressed by index. A method rather than an array of
+    // pointers so the class keeps no raw pointer members (-Weffc++).
+    Checkbox& band_check(size_t index);
 
     std::filesystem::path file_path{};
     std::unique_ptr<ReplayThread> replay_thread{};
