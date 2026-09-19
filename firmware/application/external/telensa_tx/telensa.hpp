@@ -85,7 +85,7 @@ enum band_plan_t {
 
 struct band_def_t {
     const char* name;
-    uint64_t base_hz;      // Centre frequency of channel 0
+    uint64_t base_hz;  // Centre frequency of channel 0
     uint32_t channel_count;
 };
 
