@@ -32,9 +32,16 @@ waterfall - on the bench.
 For a scenario that actually places a receiver at a no-fly-zone coordinate,
 regenerate with gps-sdr-sim using the command the app shows under "?".
 
+Each band is written as <zone>_<band>.C8 with a matching .TXT carrying that
+band's centre frequency, which is the layout the app's band-hopping engine
+looks for in the GEOFENCE folder.
+
 Usage:
-    python3 gen_geofence_sample.py [output.C8] [duration_ms]
-    (defaults: ../../sdcard/GEOFENCE/HKG.C8, 200 ms)
+    python3 gen_geofence_sample.py [out_dir] [zone] [bands] [duration_ms]
+    (defaults: ../../sdcard/GEOFENCE, HKG, "L1,L5", 200 ms)
+
+    Full hop set:
+    python3 gen_geofence_sample.py . HKG L1,B1I,GLON,L5,L2C
 """
 
 import os
@@ -78,12 +85,19 @@ def ca_code(prn):
     return out
 
 
-def main():
-    out_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
-        os.path.dirname(__file__), "..", "..", "sdcard", "GEOFENCE", "HKG.C8")
-    duration_ms = float(sys.argv[2]) if len(sys.argv) > 2 else 200.0
+# Centre frequency per band, matching the app's band table in
+# ui_drone_geofence.cpp. Used only for the sidecar metadata.
+BAND_FREQ = {
+    "L1": 1575420000,    # GPS L1 C/A + Galileo E1 + BeiDou B1C + QZSS L1
+    "B1I": 1561098000,   # BeiDou B1I
+    "GLON": 1602000000,  # GLONASS L1 (FDMA centre)
+    "L5": 1176450000,    # GPS L5 + Galileo E5a + BeiDou B2a
+    "L2C": 1227600000,   # GPS L2C
+}
 
-    prns = [1, 11, 17, 22]  # a few "visible" satellites for a realistic spectrum
+
+def write_band(out_path, band, duration_ms, prns):
+    """Write one <zone>_<band>.C8 test vector plus its .TXT metadata."""
     codes = {p: ca_code(p) for p in prns}
 
     n_samples = int(round(FS * duration_ms / 1000.0))
@@ -118,11 +132,40 @@ def main():
     meta_path = os.path.splitext(out_path)[0] + ".TXT"
     with open(meta_path, "w") as f:
         f.write("sample_rate=%d\n" % FS)
-        f.write("center_frequency=1575420000\n")
+        f.write("center_frequency=%d\n" % BAND_FREQ[band])
 
-    print("Wrote %s (%d bytes, %.0f ms, PRNs %s)" % (
-        out_path, len(buf), duration_ms, prns))
+    print("Wrote %s (%d bytes, %.0f ms, band %s, PRNs %s)" % (
+        out_path, len(buf), duration_ms, band, prns))
     print("Wrote %s" % meta_path)
+
+
+def main():
+    out_dir = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
+        os.path.dirname(__file__), "..", "..", "sdcard", "GEOFENCE")
+    zone = sys.argv[2] if len(sys.argv) > 2 else "HKG"
+    # Bands to emit. L1 and L5 ship as samples; pass more on the command line
+    # (e.g. "L1,B1I,GLON,L5,L2C") to generate the full hop set.
+    band_list = (sys.argv[3] if len(sys.argv) > 3 else "L1,L5").split(",")
+    duration_ms = float(sys.argv[4]) if len(sys.argv) > 4 else 200.0
+
+    # A few "visible" satellites for a realistic spread-spectrum shape. Distinct
+    # PRN sets per band so the hop is visually distinguishable on a waterfall.
+    prn_sets = {
+        "L1": [1, 11, 17, 22],
+        "B1I": [2, 12, 18, 23],
+        "GLON": [3, 13, 19, 24],
+        "L5": [5, 15, 20, 26],
+        "L2C": [7, 16, 21, 28],
+    }
+
+    for band in band_list:
+        band = band.strip()
+        if band not in BAND_FREQ:
+            print("Unknown band %r (known: %s)" % (
+                band, ",".join(sorted(BAND_FREQ))))
+            sys.exit(2)
+        path = os.path.join(out_dir, "%s_%s.C8" % (zone, band))
+        write_band(path, band, duration_ms, prn_sets[band])
 
 
 if __name__ == "__main__":
