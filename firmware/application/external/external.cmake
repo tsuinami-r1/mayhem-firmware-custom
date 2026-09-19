@@ -45,6 +45,10 @@ set(EXTCPPSRC
 	external/gpssim/main.cpp
 	external/gpssim/gps_sim_app.cpp
 
+	#drone_geofence - GNSS no-fly-zone TX (reuses PGPS baseband)
+	external/drone_geofence/main.cpp
+	external/drone_geofence/ui_drone_geofence.cpp
+
 	#spainter   464 byte
 	external/spainter/main.cpp
 	external/spainter/ui_spectrum_painter.cpp
@@ -410,6 +414,7 @@ set(EXTAPPLIST
 	lcr
 	jammer
 	gpssim
+	drone_geofence
 	spainter
 	keyfob
 	tetris
